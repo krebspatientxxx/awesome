@@ -13,10 +13,26 @@
 
     <form id="captchaForm">
       <div id="captcha-container"></div>
-      <button type="submit" class="btn">Verifizieren</button>
+      
+      <div class="button-group">
+        <button type="submit" class="btn btn-primary" id="verifyBtn">
+          <span class="btn-icon">✓</span>
+          <span class="btn-text">Verifizieren</span>
+        </button>
+        <button type="button" class="btn btn-secondary" onclick="resetForm()">
+          <span class="btn-icon">↻</span>
+          <span class="btn-text">Zurücksetzen</span>
+        </button>
+      </div>
     </form>
 
     <div id="result" class="result hidden"></div>
+
+    <div class="footer">
+      <a href="/test" target="_blank" class="link">🧪 Test Dashboard</a>
+      <span class="separator">•</span>
+      <a href="https://docs.hcaptcha.com" target="_blank" class="link">📚 Dokumentation</a>
+    </div>
   </div>
 
   <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
