@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>hCaptcha Test Dashboard</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Courier New', monospace;
+      background: #1e1e1e;
+      color: #00ff00;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: #2d2d2d;
+      border: 2px solid #00ff00;
+      border-radius: 5px;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #00ff00;
+      text-shadow: 0 0 10px #00ff00;
+    }
+    .section {
+      margin: 20px 0;
+      padding: 15px;
+      background: #1e1e1e;
+      border-left: 3px solid #00ff00;
+    }
+    h2 {
+      margin-bottom: 10px;
+      color: #00ff00;
+    }
+    .test-btn {
+      background: #00ff00;
+      color: #1e1e1e;
+      border: none;
+      padding: 10px 20px;
+      margin: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      border-radius: 3px;
+      transition: all 0.3s;
+    }
+    .test-btn:hover {
+      background: #00cc00;
+      transform: scale(1.05);
+    }
+    .output {
+      background: #111;
+      border: 1px solid #00ff00;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 3px;
+      max-height: 300px;
+      overflow-y: auto;
+      font-size: 12px;
+    }
+    .success { color: #00ff00; }
+    .error { color: #ff0000; }
+    .info { color: #00aaff; }
+    .warning { color: #ffaa00; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧪 hCaptcha Test Dashboard</h1>
+
+    <div class="section">
+      <h2>📡 API Tests</h2>
+      <button class="test-btn" onclick="testServer()">🔗 Server Status</button>
+      <button class="test-btn" onclick="testConfig()">⚙️ Config laden</button>
+      <button class="test-btn" onclick="testDummyVerify()">✅ Dummy Token test</button>
+      <button class="test-btn" onclick="clearOutput()">🗑️ Ausgabe löschen</button>
+      <div class="output" id="output"></div>
+    </div>
+
+    <div class="section">
+      <h2>🎯 Frontend Test</h2>
+      <button class="test-btn" onclick="window.open('/index.html', '_blank')">🌐 Öffne Frontend</button>
+      <button class="test-btn" onclick="testDOM()">📍 DOM Check</button>
+      <div class="output" id="output2"></div>
+    </div>
+
+    <div class="section">
+      <h2>📊 System Info</h2>
+      <button class="test-btn" onclick="showSystemInfo()">💻 System Info</button>
+      <div class="output" id="output3"></div>
+    </div>
+  </div>
+
+  <script>
+    const log = (msg, type = 'info') => {
+      const output = document.getElementById('output');
+      const line = document.createElement('div');
+      line.className = type;
+      line.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      output.appendChild(line);
+      output.scrollTop = output.scrollHeight;
+    };
+
+    const testServer = async () => {
+      log('🔗 Teste Server...');
+      try {
+        const response = await fetch('/');
+        if (response.ok) {
+          log('✅ Server läuft!', 'success');
+        } else {
+          log(`❌ Server Fehler: ${response.status}`, 'error');
+        }
+      } catch (e) {
+        log(`❌ Server nicht erreichbar: ${e.message}`, 'error');
+      }
+    };
+
+    const testConfig = async () => {
+      log('⚙️ Lade Config...');
+      try {
+        const response = await fetch('/api/config');
+        const data = await response.json();
+        log(`✅ Site Key: ${data.siteKey}`, 'success');
+        log(`📍 Status: ${data.status}`, 'success');
+      } catch (e) {
+        log(`❌ Config Fehler: ${e.message}`, 'error');
+      }
+    };
+
+    const testDummyVerify = async () => {
+      log('✅ Teste Dummy Token...');
+      const dummyToken = 'P1000_testtoken_' + Math.random().toString(36).substring(7);
+      log(`Token: ${dummyToken}`);
+      try {
+        const response = await fetch('/api/verify-captcha', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: dummyToken })
+        });
+        const data = await response.json();
+        if (data.success) {
+          log(`✅ ${data.message}`, 'success');
+        } else {
+          log(`⚠️ ${data.message}`, 'warning');
+        }
+        log(`📊 Details: ${JSON.stringify(data)}`, 'info');
+      } catch (e) {
+        log(`❌ Fehler: ${e.message}`, 'error');
+      }
+    };
+
+    const testDOM = () => {
+      const output = document.getElementById('output2');
+      output.innerHTML = '';
+      const log2 = (msg, type = 'info') => {
+        const line = document.createElement('div');
+        line.className = type;
+        line.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+        output.appendChild(line);
+      };
+      log2('📍 DOM Check:', 'info');
+      log2(`✅ Browser: ${navigator.userAgent.substring(0, 50)}...`, 'success');
+      log2(`✅ URL: ${window.location.href}`, 'success');
+      log2(`✅ Online: ${navigator.onLine ? 'Ja' : 'Nein'}`, 'success');
+    };
+
+    const showSystemInfo = () => {
+      const output = document.getElementById('output3');
+      output.innerHTML = '';
+      const log3 = (msg, type = 'info') => {
+        const line = document.createElement('div');
+        line.className = type;
+        line.textContent = msg;
+        output.appendChild(line);
+      };
+      log3(`💻 Browser: ${navigator.userAgent.substring(0, 50)}...`, 'info');
+      log3(`📍 Timezone: ${Intl.DateTimeFormat().resolvedOptions().timeZone}`, 'info');
+      log3(`🕐 Zeit: ${new Date().toLocaleString()}`, 'info');
+      log3(`🌐 URL: ${window.location.href}`, 'info');
+      log3(`📡 Online: ${navigator.onLine ? '✅ Ja' : '❌ Nein'}`, 'success');
+    };
+
+    const clearOutput = () => {
+      document.getElementById('output').innerHTML = '';
+      log('🗑️ Ausgabe geleert');
+    };
+
+    // Auto-Test on load
+    window.addEventListener('load', () => {
+      log('🚀 Dashboard geladen');
+      testServer();
+    });
+  </script>
+</body>
+</html>
