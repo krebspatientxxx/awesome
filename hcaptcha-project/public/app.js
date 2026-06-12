@@ -2,7 +2,7 @@ console.log('🚀 App.js geladen');
 
 const form = document.getElementById('captchaForm');
 const resultDiv = document.getElementById('result');
-const btn = form.querySelector('button');
+const btn = document.getElementById('verifyBtn');
 
 // hCaptcha Render
 function renderCaptcha() {
@@ -59,7 +59,7 @@ form.addEventListener('submit', async (e) => {
   }
   
   btn.disabled = true;
-  btn.textContent = '⏳ Verifiziere...';
+  btn.innerHTML = '<span class="btn-icon loading-spinner">⟳</span><span class="btn-text"><span>VERIFIZIERT</span><span>wird gerade</span></span>';
   showResult('⏳ Verifiziere dich...', 'loading');
   
   try {
@@ -87,7 +87,7 @@ form.addEventListener('submit', async (e) => {
     showResult('❌ Fehler: ' + error.message, 'error');
   } finally {
     btn.disabled = false;
-    btn.textContent = 'Verifizieren';
+    btn.innerHTML = '<span class="btn-icon">✓</span><span class="btn-text"><span>VERIFIZIEREN</span><span>Jetzt klicken!</span></span>';
     hcaptcha.reset();
   }
 });
@@ -96,6 +96,15 @@ function showResult(message, type) {
   resultDiv.textContent = message;
   resultDiv.className = `result show ${type}`;
   console.log(`📢 ${type.toUpperCase()}: ${message}`);
+}
+
+// Reset Function
+function resetForm() {
+  form.reset();
+  resultDiv.innerHTML = '';
+  resultDiv.className = 'result hidden';
+  hcaptcha.reset();
+  console.log('↻ Formular zurückgesetzt');
 }
 
 // Auf hCaptcha warten
